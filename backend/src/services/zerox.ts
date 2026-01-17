@@ -70,11 +70,11 @@ export async function getSwapQuote(params: QuoteParams): Promise<QuoteResponse> 
   });
 
   if (!response.ok) {
-    const error = await response.json();
+    const error = await response.json() as { reason?: string };
     throw new Error(error.reason || 'Failed to get quote from 0x');
   }
 
-  return response.json();
+  return response.json() as Promise<QuoteResponse>;
 }
 
 export interface PriceParams {
@@ -115,11 +115,11 @@ export async function getPrice(params: PriceParams): Promise<PriceResponse> {
   });
 
   if (!response.ok) {
-    const error = await response.json();
+    const error = await response.json() as { reason?: string };
     throw new Error(error.reason || 'Failed to get price from 0x');
   }
 
-  return response.json();
+  return response.json() as Promise<PriceResponse>;
 }
 
 // Common token addresses by chain
