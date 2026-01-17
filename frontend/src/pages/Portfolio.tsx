@@ -1,6 +1,6 @@
 import { useAccount, useBalance } from 'wagmi';
 import { Wallet, ExternalLink } from 'lucide-react';
-import { TOKEN_LIST } from '../lib/store';
+import { getTokenList, useTradingStore, type TokenInfo } from '../lib/store';
 import { CHAIN_INFO } from '../lib/wagmi';
 
 // All supported chains
@@ -8,6 +8,7 @@ const SUPPORTED_CHAINS = [8453, 1, 137, 42161]; // Base, Ethereum, Polygon, Arbi
 
 function Portfolio() {
   const { address } = useAccount();
+  const { customTokens } = useTradingStore();
 
   const truncateAddress = (addr: string) =>
     `${addr.slice(0, 6)}...${addr.slice(-4)}`;
@@ -38,7 +39,7 @@ function Portfolio() {
       {/* Chain Sections */}
       {SUPPORTED_CHAINS.map((chainId) => {
         const chainInfo = CHAIN_INFO[chainId as keyof typeof CHAIN_INFO];
-        const tokens = TOKEN_LIST[chainId] || [];
+        const tokens = getTokenList(chainId, customTokens);
 
         if (tokens.length === 0) return null;
 
@@ -96,12 +97,7 @@ function ChainSection({
 }: {
   chainId: number;
   chainInfo: { name: string; icon: string; explorer: string } | undefined;
-  tokens: Array<{
-    address: `0x${string}`;
-    symbol: string;
-    name: string;
-    decimals: number;
-  }>;
+  tokens: TokenInfo[];
   address: `0x${string}`;
 }) {
   return (
@@ -145,12 +141,7 @@ function TokenBalanceRow({
   chainId,
 }: {
   address: `0x${string}`;
-  token: {
-    address: `0x${string}`;
-    symbol: string;
-    name: string;
-    decimals: number;
-  };
+  token: TokenInfo;
   chainId: number;
 }) {
   const isNative = token.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
@@ -171,7 +162,14 @@ function TokenBalanceRow({
           {token.symbol.slice(0, 2)}
         </div>
         <div>
-          <p className={`font-medium ${hasBalance ? 'text-white' : 'text-gray-400'}`}>{token.symbol}</p>
+          <div className="flex items-center gap-2">
+            <p className={`font-medium ${hasBalance ? 'text-white' : 'text-gray-400'}`}>{token.symbol}</p>
+            {token.isCustom && (
+              <span className="text-xs bg-moonboots-purple/30 text-moonboots-purple-light px-1.5 py-0.5 rounded">
+                Custom
+              </span>
+            )}
+          </div>
           <p className="text-xs text-gray-500">{token.name}</p>
         </div>
       </div>
