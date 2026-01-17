@@ -24,10 +24,7 @@ function Layout() {
       <aside className="w-64 bg-moonboots-dark-light border-r border-gray-800 flex flex-col">
         {/* Logo */}
         <div className="p-6 border-b border-gray-800">
-          <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="MoonBoots" className="h-8 w-auto" />
-            <span className="text-xl font-bold gradient-text">MoonBoots</span>
-          </div>
+          <img src="/logo.png" alt="MoonBoots" className="h-8 w-auto" />
           <p className="text-xs text-gray-500 mt-1">Trading Agency</p>
         </div>
 
