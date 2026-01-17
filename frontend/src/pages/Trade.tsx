@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useAccount, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
-import { parseEther } from 'viem';
-import { useMutation } from '@tanstack/react-query';
-import { ArrowDownUp, Brain, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
+import { parseEther, Address } from 'viem';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { ArrowDownUp, Brain, Loader2, AlertCircle, CheckCircle, TrendingUp } from 'lucide-react';
 import { useTradingStore, TOKEN_LIST } from '../lib/store';
-import { getQuote, getAnalysis, reportTradeComplete } from '../lib/api';
+import { getQuote, getAnalysis, reportTradeComplete, getHistoricalPrices } from '../lib/api';
 import TokenSelect from '../components/TokenSelect';
 import AIAnalysis from '../components/AIAnalysis';
+import PriceChart from '../components/PriceChart';
 
 function Trade() {
   const { address } = useAccount();
@@ -114,6 +115,14 @@ function Trade() {
   }
 
   const buyTokenInfo = TOKEN_LIST[selectedChainId]?.find((t) => t.address === buyToken);
+
+  // Fetch historical prices for buy token
+  const { data: priceHistory } = useQuery({
+    queryKey: ['priceHistory', selectedChainId, buyToken],
+    queryFn: () => getHistoricalPrices(selectedChainId, buyToken as Address, 7),
+    enabled: !!buyToken && buyToken !== '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+    staleTime: 60000, // 1 minute
+  });
 
   // Check access
   if (!accessStatus?.hasAccess) {
@@ -273,6 +282,17 @@ function Trade() {
               )}
             </div>
           </div>
+
+          {/* Price Chart */}
+          {buyToken && buyToken !== '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && (
+            <div className="card">
+              <div className="flex items-center gap-2 mb-4">
+                <TrendingUp className="w-5 h-5 text-moonboots-purple" />
+                <h3 className="font-semibold">{buyTokenInfo?.symbol || 'Token'} 7-Day Chart</h3>
+              </div>
+              <PriceChart data={priceHistory ?? null} height={150} />
+            </div>
+          )}
 
           {/* AI Analysis Button */}
           <button

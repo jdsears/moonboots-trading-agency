@@ -246,3 +246,126 @@ export async function getHistoricalPrices(
   }
   return response.json();
 }
+
+// Chat API Types
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export interface ChatAction {
+  type: 'swap' | 'alert' | 'dca' | 'limit_order' | 'none';
+  data?: unknown;
+}
+
+export interface ChatResponse {
+  message: string;
+  action?: ChatAction;
+}
+
+export interface PriceAlert {
+  chainId: number;
+  tokenAddress: string;
+  tokenSymbol: string;
+  targetPrice: number;
+  condition: 'above' | 'below';
+  createdAt: number;
+  triggered: boolean;
+}
+
+export interface DCAStrategy {
+  chainId: number;
+  buyToken: string;
+  buyTokenSymbol: string;
+  sellToken: string;
+  amountPerPurchase: string;
+  frequency: string;
+  totalPurchases: number;
+  completedPurchases: number;
+  active: boolean;
+  createdAt: number;
+}
+
+export interface LimitOrder {
+  chainId: number;
+  sellToken: string;
+  buyToken: string;
+  sellAmount: string;
+  targetPrice: number;
+  expiresAt: number;
+  status: 'pending' | 'filled' | 'cancelled' | 'expired';
+  createdAt: number;
+}
+
+// Chat API Functions
+export async function sendChatMessage(
+  messages: ChatMessage[],
+  walletAddress: Address,
+  chainId: number
+): Promise<ChatResponse> {
+  const response = await fetch(`${API_BASE}/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages, walletAddress, chainId }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to send message');
+  }
+  return response.json();
+}
+
+export async function getUserAlerts(walletAddress: Address): Promise<PriceAlert[]> {
+  const response = await fetch(`${API_BASE}/chat/alerts?walletAddress=${walletAddress}`);
+  if (!response.ok) {
+    throw new Error('Failed to get alerts');
+  }
+  const data = await response.json();
+  return data.alerts;
+}
+
+export async function deleteAlert(alertId: string, walletAddress: Address): Promise<void> {
+  const response = await fetch(`${API_BASE}/chat/alerts/${alertId}?walletAddress=${walletAddress}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete alert');
+  }
+}
+
+export async function getUserDCAStrategies(walletAddress: Address): Promise<DCAStrategy[]> {
+  const response = await fetch(`${API_BASE}/chat/dca?walletAddress=${walletAddress}`);
+  if (!response.ok) {
+    throw new Error('Failed to get DCA strategies');
+  }
+  const data = await response.json();
+  return data.strategies;
+}
+
+export async function cancelDCAStrategy(strategyId: string, walletAddress: Address): Promise<void> {
+  const response = await fetch(`${API_BASE}/chat/dca/${strategyId}?walletAddress=${walletAddress}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to cancel DCA strategy');
+  }
+}
+
+export async function getUserLimitOrders(walletAddress: Address): Promise<LimitOrder[]> {
+  const response = await fetch(`${API_BASE}/chat/orders?walletAddress=${walletAddress}`);
+  if (!response.ok) {
+    throw new Error('Failed to get limit orders');
+  }
+  const data = await response.json();
+  return data.orders;
+}
+
+export async function cancelLimitOrder(orderId: string, walletAddress: Address): Promise<void> {
+  const response = await fetch(`${API_BASE}/chat/orders/${orderId}?walletAddress=${walletAddress}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to cancel order');
+  }
+}

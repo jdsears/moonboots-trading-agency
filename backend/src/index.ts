@@ -8,6 +8,7 @@ import tradeRoutes from './routes/trade.js';
 import agentRoutes from './routes/agent.js';
 import revenueRoutes from './routes/revenue.js';
 import marketRoutes from './routes/market.js';
+import chatRoutes from './routes/chat.js';
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ app.use('/api/trade', tradeRoutes);
 app.use('/api/agent', agentRoutes);
 app.use('/api/revenue', revenueRoutes);
 app.use('/api/market', marketRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Error handling
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {

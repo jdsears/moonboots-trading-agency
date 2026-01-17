@@ -104,7 +104,7 @@ export async function getTokenPrice(chainId: number, tokenAddress: Address): Pro
 
       if (!response.ok) return null;
 
-      const data = await response.json();
+      const data = await response.json() as { coins?: Record<string, { price: number; change24h?: number; mcap?: number }> };
       const coin = data.coins?.[tokenId];
 
       if (!coin) return null;
@@ -137,7 +137,19 @@ export async function getTokenMarketData(chainId: number, tokenAddress: Address)
 
       if (!response.ok) return null;
 
-      const data = await response.json();
+      const data = await response.json() as { market_data?: {
+        current_price?: { usd?: number };
+        price_change_percentage_24h?: number;
+        price_change_percentage_7d?: number;
+        total_volume?: { usd?: number };
+        market_cap?: { usd?: number };
+        total_supply?: number;
+        circulating_supply?: number;
+        ath?: { usd?: number };
+        ath_change_percentage?: { usd?: number };
+        atl?: { usd?: number };
+        atl_change_percentage?: { usd?: number };
+      } };
       const market = data.market_data;
 
       if (!market) return null;
@@ -201,10 +213,18 @@ export async function getMarketOverview(): Promise<MarketOverview | null> {
 
       if (!globalResponse.ok) return null;
 
-      const globalData = await globalResponse.json();
-      const trendingData = trendingResponse.ok ? await trendingResponse.json() : { coins: [] };
+      const globalData = await globalResponse.json() as { data?: {
+        total_market_cap?: { usd?: number };
+        total_volume?: { usd?: number };
+        market_cap_percentage?: { btc?: number; eth?: number };
+      } };
+      const trendingData = trendingResponse.ok
+        ? await trendingResponse.json() as { coins?: Array<{ item: { symbol: string; name: string; data?: { price_change_percentage_24h?: { usd?: number } } } }> }
+        : { coins: [] };
 
       const global = globalData.data;
+
+      if (!global) return null;
 
       return {
         totalMarketCap: global.total_market_cap?.usd || 0,
@@ -212,7 +232,7 @@ export async function getMarketOverview(): Promise<MarketOverview | null> {
         btcDominance: global.market_cap_percentage?.btc || 0,
         ethDominance: global.market_cap_percentage?.eth || 0,
         fearGreedIndex: 50, // Would need separate API
-        trending: trendingData.coins?.slice(0, 5).map((c: { item: { symbol: string; name: string; data?: { price_change_percentage_24h?: { usd: number } } } }) => ({
+        trending: trendingData.coins?.slice(0, 5).map((c) => ({
           symbol: c.item.symbol,
           name: c.item.name,
           priceChange24h: c.item.data?.price_change_percentage_24h?.usd || 0,
@@ -236,7 +256,7 @@ export async function getGasPrices(chainId: number): Promise<{ slow: number; sta
         // Ethereum - use Etherscan gas tracker
         const response = await fetch('https://api.etherscan.io/api?module=gastracker&action=gasoracle');
         if (!response.ok) return null;
-        const data = await response.json();
+        const data = await response.json() as { status: string; result: { SafeGasPrice: string; ProposeGasPrice: string; FastGasPrice: string } };
         if (data.status !== '1') return null;
         return {
           slow: parseFloat(data.result.SafeGasPrice),
@@ -349,8 +369,8 @@ export async function getHistoricalPrices(
 
       if (!response.ok) return null;
 
-      const data = await response.json();
-      return data.coins?.[tokenId]?.prices?.map((p: { timestamp: number; price: number }) => ({
+      const data = await response.json() as { coins?: Record<string, { prices?: Array<{ timestamp: number; price: number }> }> };
+      return data.coins?.[tokenId]?.prices?.map((p) => ({
         timestamp: p.timestamp,
         price: p.price,
       })) || null;

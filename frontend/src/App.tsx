@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Trade from './pages/Trade';
+import Chat from './pages/Chat';
 import Portfolio from './pages/Portfolio';
 import Settings from './pages/Settings';
 import Landing from './pages/Landing';
@@ -35,6 +36,7 @@ function App() {
           <Route element={<Layout />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/trade" element={<Trade />} />
+            <Route path="/chat" element={<Chat />} />
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/settings" element={<Settings />} />
           </Route>

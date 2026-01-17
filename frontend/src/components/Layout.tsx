@@ -1,6 +1,6 @@
 import { Outlet, NavLink } from 'react-router-dom';
 import { useAccount, useDisconnect } from 'wagmi';
-import { LayoutDashboard, ArrowLeftRight, Wallet, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, ArrowLeftRight, MessageCircle, Wallet, Settings, LogOut } from 'lucide-react';
 import { useTradingStore } from '../lib/store';
 
 function Layout() {
@@ -11,6 +11,7 @@ function Layout() {
   const navItems = [
     { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/trade', icon: ArrowLeftRight, label: 'Trade' },
+    { to: '/chat', icon: MessageCircle, label: 'Luna AI' },
     { to: '/portfolio', icon: Wallet, label: 'Portfolio' },
     { to: '/settings', icon: Settings, label: 'Settings' },
   ];
