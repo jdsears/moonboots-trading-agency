@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import ReactMarkdown from 'react-markdown';
 import { Send, Bot, User, Loader2, AlertCircle, Sparkles, Bell, TrendingUp, Target } from 'lucide-react';
 import { useTradingStore } from '../lib/store';
 import {
@@ -200,7 +201,13 @@ function Chat() {
                           : 'bg-gray-800 text-gray-100'
                       }`}
                     >
-                      <p className="whitespace-pre-wrap">{msg.content}</p>
+                      {msg.role === 'user' ? (
+                        <p className="whitespace-pre-wrap">{msg.content}</p>
+                      ) : (
+                        <div className="prose prose-invert prose-sm max-w-none prose-headings:text-white prose-headings:font-semibold prose-headings:mt-3 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5 prose-strong:text-moonboots-gold">
+                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        </div>
+                      )}
                     </div>
                     {msg.role === 'user' && (
                       <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
