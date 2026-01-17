@@ -124,7 +124,7 @@ function Landing() {
           <div className="card text-center">
             <p className="text-sm text-gray-400 mb-2">Max Discount</p>
             <p className="text-4xl font-bold text-green-400">0.375%</p>
-            <p className="text-xs text-gray-500 mt-2">VIP + 1000 MBDAO tokens</p>
+            <p className="text-xs text-gray-500 mt-2">VIP + 10000 MBDAO tokens</p>
           </div>
         </div>
       </div>
@@ -132,7 +132,7 @@ function Landing() {
       {/* Footer */}
       <footer className="border-t border-gray-800 py-8">
         <div className="max-w-6xl mx-auto px-6 text-center text-gray-500 text-sm">
-          <p>Built with 💜 for MoonBoots VIP Community</p>
+          <p>Built with 💜 for MoonBoots Community</p>
           <div className="flex justify-center gap-6 mt-4">
             <a href="https://opensea.io/collection/moonboots-mb1" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
               MB1 Collection
