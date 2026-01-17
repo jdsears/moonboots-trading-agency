@@ -110,10 +110,64 @@ export const TOKEN_LIST: Record<number, Array<{
       decimals: 18,
     },
     {
-      address: '0xA0b86a33E6417Aa971AED0D0F3D7c3bBf83C7F0D',
+      address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
       symbol: 'USDC',
       name: 'USD Coin',
       decimals: 6,
+    },
+    {
+      address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+      symbol: 'USDT',
+      name: 'Tether USD',
+      decimals: 6,
+    },
+  ],
+  // Polygon
+  137: [
+    {
+      address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+      symbol: 'MATIC',
+      name: 'Polygon',
+      decimals: 18,
+    },
+    {
+      address: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359',
+      symbol: 'USDC',
+      name: 'USD Coin',
+      decimals: 6,
+    },
+    {
+      address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
+      symbol: 'WETH',
+      name: 'Wrapped Ether',
+      decimals: 18,
+    },
+  ],
+  // Arbitrum
+  42161: [
+    {
+      address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+      symbol: 'ETH',
+      name: 'Ethereum',
+      decimals: 18,
+    },
+    {
+      address: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
+      symbol: 'USDC',
+      name: 'USD Coin',
+      decimals: 6,
+    },
+    {
+      address: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
+      symbol: 'WETH',
+      name: 'Wrapped Ether',
+      decimals: 18,
+    },
+    {
+      address: '0x912CE59144191C1204E64559FE8253a0e49E6548',
+      symbol: 'ARB',
+      name: 'Arbitrum',
+      decimals: 18,
     },
   ],
 };
