@@ -1,5 +1,5 @@
 import { createPublicClient, http, Address, parseAbi } from 'viem';
-import { base, mainnet, polygon, arbitrum } from 'viem/chains';
+import { base, mainnet, polygon, arbitrum, bsc } from 'viem/chains';
 
 // NFT Contract addresses from environment
 const NFT_CONTRACTS = {
@@ -38,6 +38,10 @@ const clients = {
     chain: arbitrum,
     transport: http(),
   }),
+  bsc: createPublicClient({
+    chain: bsc,
+    transport: http(),
+  }),
 };
 
 export interface NFTHoldings {
@@ -62,14 +66,15 @@ const VIP_DISCOUNT = 0.20; // 20% off for VIP
 const MBDAO_HOLDER_DISCOUNT = 0.05; // Additional 5% off for 10000+ MBDAO holders
 
 export async function checkNFTHoldings(address: Address): Promise<NFTHoldings> {
-  // NFTs are on Ethereum mainnet, MBDAO token is on Base
-  const mainnetClient = clients.mainnet;
+  // MoonBoots MB1 on Polygon, Chappyz on BSC, MBDAO token on Base
+  const polygonClient = clients.polygon;
+  const bscClient = clients.bsc;
   const baseClient = clients.base;
 
   try {
     const [moonbootsMB1, chappyz, mbdaoVIP, mbdaoTokens] = await Promise.all([
       NFT_CONTRACTS.MOONBOOTS_MB1
-        ? mainnetClient.readContract({
+        ? polygonClient.readContract({
             address: NFT_CONTRACTS.MOONBOOTS_MB1,
             abi: ERC721_ABI,
             functionName: 'balanceOf',
@@ -77,7 +82,7 @@ export async function checkNFTHoldings(address: Address): Promise<NFTHoldings> {
           })
         : 0n,
       NFT_CONTRACTS.CHAPPYZ
-        ? mainnetClient.readContract({
+        ? bscClient.readContract({
             address: NFT_CONTRACTS.CHAPPYZ,
             abi: ERC721_ABI,
             functionName: 'balanceOf',
@@ -85,7 +90,7 @@ export async function checkNFTHoldings(address: Address): Promise<NFTHoldings> {
           })
         : 0n,
       NFT_CONTRACTS.MBDAO_VIP
-        ? mainnetClient.readContract({
+        ? polygonClient.readContract({
             address: NFT_CONTRACTS.MBDAO_VIP,
             abi: ERC721_ABI,
             functionName: 'balanceOf',
