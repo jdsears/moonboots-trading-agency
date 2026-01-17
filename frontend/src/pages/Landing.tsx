@@ -13,7 +13,7 @@ function Landing() {
           {/* Logo */}
           <div className="flex items-center gap-3 mb-16">
             <img src="/logo.png" alt="MoonBoots" className="h-10 w-auto" />
-            <span className="text-2xl font-bold gradient-text">MoonBoots Trading Agency</span>
+            <span className="text-2xl font-bold gradient-text">Trading Agency</span>
           </div>
 
           {/* Hero Content */}
@@ -22,7 +22,7 @@ function Landing() {
               <h1 className="text-5xl font-bold mb-6 leading-tight">
                 AI-Powered Trading
                 <br />
-                <span className="gradient-text">For VIP Members</span>
+                <span className="gradient-text">For MoonBoots Members</span>
               </h1>
               <p className="text-xl text-gray-400 mb-8">
                 Access the most competitive crypto trading fees with AI-driven insights.
