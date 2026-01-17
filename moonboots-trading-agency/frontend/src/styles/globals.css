@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --moonboots-purple: #8B5CF6;
+  --moonboots-purple-dark: #7C3AED;
+  --moonboots-dark: #0F0F1A;
+  --moonboots-dark-light: #1A1A2E;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--moonboots-dark);
+  color: white;
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--moonboots-dark-light);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--moonboots-purple);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--moonboots-purple-dark);
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(26, 26, 46, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 50%, #F59E0B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Button base styles */
+.btn-primary {
+  @apply bg-moonboots-purple hover:bg-moonboots-purple-dark text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200;
+}
+
+.btn-secondary {
+  @apply bg-transparent border border-moonboots-purple text-moonboots-purple hover:bg-moonboots-purple hover:text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200;
+}
+
+/* Card styles */
+.card {
+  @apply bg-moonboots-dark-light rounded-xl p-6 border border-gray-800;
+}
+
+/* Input styles */
+input[type="text"],
+input[type="number"] {
+  @apply bg-moonboots-dark border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-moonboots-purple transition-colors;
+}
+
+/* Animation for loading states */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(26, 26, 46, 1) 0%,
+    rgba(139, 92, 246, 0.1) 50%,
+    rgba(26, 26, 46, 1) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
