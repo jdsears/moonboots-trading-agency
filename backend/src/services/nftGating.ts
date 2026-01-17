@@ -62,12 +62,14 @@ const VIP_DISCOUNT = 0.20; // 20% off for VIP
 const MBDAO_HOLDER_DISCOUNT = 0.05; // Additional 5% off for 10000+ MBDAO holders
 
 export async function checkNFTHoldings(address: Address): Promise<NFTHoldings> {
-  const client = clients.base;
+  // NFTs are on Ethereum mainnet, MBDAO token is on Base
+  const mainnetClient = clients.mainnet;
+  const baseClient = clients.base;
 
   try {
     const [moonbootsMB1, chappyz, mbdaoVIP, mbdaoTokens] = await Promise.all([
       NFT_CONTRACTS.MOONBOOTS_MB1
-        ? client.readContract({
+        ? mainnetClient.readContract({
             address: NFT_CONTRACTS.MOONBOOTS_MB1,
             abi: ERC721_ABI,
             functionName: 'balanceOf',
@@ -75,7 +77,7 @@ export async function checkNFTHoldings(address: Address): Promise<NFTHoldings> {
           })
         : 0n,
       NFT_CONTRACTS.CHAPPYZ
-        ? client.readContract({
+        ? mainnetClient.readContract({
             address: NFT_CONTRACTS.CHAPPYZ,
             abi: ERC721_ABI,
             functionName: 'balanceOf',
@@ -83,7 +85,7 @@ export async function checkNFTHoldings(address: Address): Promise<NFTHoldings> {
           })
         : 0n,
       NFT_CONTRACTS.MBDAO_VIP
-        ? client.readContract({
+        ? mainnetClient.readContract({
             address: NFT_CONTRACTS.MBDAO_VIP,
             abi: ERC721_ABI,
             functionName: 'balanceOf',
@@ -91,7 +93,7 @@ export async function checkNFTHoldings(address: Address): Promise<NFTHoldings> {
           })
         : 0n,
       MBDAO_TOKEN
-        ? client.readContract({
+        ? baseClient.readContract({
             address: MBDAO_TOKEN,
             abi: ERC20_ABI,
             functionName: 'balanceOf',
