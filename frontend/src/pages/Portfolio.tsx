@@ -39,7 +39,7 @@ function Portfolio() {
             </div>
           </div>
           <a
-            href={`https://basescan.org/address/${address}`}
+            href={`${chainInfo?.explorer || 'https://basescan.org'}/address/${address}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-sm text-moonboots-purple hover:underline"

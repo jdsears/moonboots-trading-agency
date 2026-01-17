@@ -24,21 +24,25 @@ export const CHAIN_INFO = {
     name: 'Ethereum',
     icon: '⟠',
     color: '#627EEA',
+    explorer: 'https://etherscan.io',
   },
   [base.id]: {
     name: 'Base',
     icon: '🔵',
     color: '#0052FF',
+    explorer: 'https://basescan.org',
   },
   [polygon.id]: {
     name: 'Polygon',
     icon: '🟣',
     color: '#8247E5',
+    explorer: 'https://polygonscan.com',
   },
   [arbitrum.id]: {
     name: 'Arbitrum',
     icon: '🔷',
     color: '#28A0F0',
+    explorer: 'https://arbiscan.io',
   },
 };
 

@@ -7,6 +7,12 @@ const MBDAO_BUYBACK_PERCENTAGE = parseInt(process.env.MBDAO_BUYBACK_PERCENTAGE |
 const BUYBACK_THRESHOLD_USD = parseFloat(process.env.BUYBACK_THRESHOLD_USD || '100');
 const ADMIN_PRIVATE_KEY = process.env.ADMIN_WALLET_PRIVATE_KEY;
 
+// TODO: PRODUCTION REQUIREMENTS
+// 1. Replace in-memory tracking with PostgreSQL/MongoDB for persistence
+// 2. Integrate price oracle (Chainlink, Pyth, or CoinGecko API) for ETH/USD pricing
+// 3. Add audit logging for all fee distributions and buyback executions
+// 4. Implement multi-signature or timelock for large buyback operations
+
 // In-memory tracking (use database in production)
 let accumulatedFees = {
   totalUSD: 0,
@@ -77,8 +83,10 @@ export async function executeBuyback(): Promise<BuybackRecord | null> {
       transport: http(),
     });
 
-    // Get current ETH price (simplified - use oracle in production)
-    const ethPriceUSD = 2500; // Placeholder - fetch real price
+    // CRITICAL: Replace with real price oracle before production deployment!
+    // Options: Chainlink (on-chain), Pyth Network, or CoinGecko/CoinMarketCap API
+    // Example Chainlink Price Feed on Base: 0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70 (ETH/USD)
+    const ethPriceUSD = 2500; // PLACEHOLDER - DO NOT USE IN PRODUCTION
     const ethAmount = accumulatedFees.buybackPoolUSD / ethPriceUSD;
     const ethAmountWei = parseEther(ethAmount.toString());
 
