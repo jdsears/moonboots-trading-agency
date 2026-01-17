@@ -42,7 +42,6 @@ function Trade() {
         throw new Error('Missing required fields');
       }
 
-      const token = TOKEN_LIST[selectedChainId]?.find((t) => t.address === sellToken);
       const amount = parseEther(sellAmount);
 
       return getQuote({

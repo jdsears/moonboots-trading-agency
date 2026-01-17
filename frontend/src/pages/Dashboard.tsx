@@ -45,7 +45,7 @@ function Dashboard() {
           <p className="text-3xl font-bold">
             {accessStatus ? `${(accessStatus.effectiveFeeBps / 100).toFixed(2)}%` : '-'}
           </p>
-          {accessStatus?.feeDiscount > 0 && (
+          {accessStatus?.feeDiscount && accessStatus.feeDiscount > 0 && (
             <p className="text-sm text-green-400 mt-1">
               {(accessStatus.feeDiscount * 100).toFixed(0)}% discount applied
             </p>
