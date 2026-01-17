@@ -7,11 +7,15 @@ import dotenv from 'dotenv';
 import tradeRoutes from './routes/trade.js';
 import agentRoutes from './routes/agent.js';
 import revenueRoutes from './routes/revenue.js';
+import marketRoutes from './routes/market.js';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Trust proxy for Railway/cloud deployments
+app.set('trust proxy', 1);
 
 // Security middleware
 app.use(helmet());
@@ -38,6 +42,7 @@ app.get('/health', (req, res) => {
 app.use('/api/trade', tradeRoutes);
 app.use('/api/agent', agentRoutes);
 app.use('/api/revenue', revenueRoutes);
+app.use('/api/market', marketRoutes);
 
 // Error handling
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {

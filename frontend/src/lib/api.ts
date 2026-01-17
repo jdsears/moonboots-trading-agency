@@ -76,6 +76,51 @@ export interface RevenueStats {
   }>;
 }
 
+// Market Data Types
+export interface TokenPrice {
+  usd: number;
+  usd_24h_change: number;
+  usd_24h_vol?: number;
+  usd_market_cap?: number;
+}
+
+export interface TokenMarketData {
+  price: number;
+  priceChange24h: number;
+  priceChange7d?: number;
+  volume24h: number;
+  marketCap: number;
+  totalSupply?: number;
+  circulatingSupply?: number;
+  ath?: number;
+  athChangePercent?: number;
+}
+
+export interface TokenSafetyScore {
+  score: number;
+  risks: string[];
+  warnings: string[];
+  isVerified: boolean;
+  hasLiquidity: boolean;
+  liquidityLocked: boolean;
+  contractAge: number;
+}
+
+export interface MarketOverview {
+  totalMarketCap: number;
+  totalVolume24h: number;
+  btcDominance: number;
+  ethDominance: number;
+  fearGreedIndex: number;
+  trending: Array<{ symbol: string; name: string; priceChange24h: number }>;
+}
+
+export interface GasPrices {
+  slow: number;
+  standard: number;
+  fast: number;
+}
+
 // API Functions
 export async function checkAccess(address: Address): Promise<AccessStatus> {
   const response = await fetch(`${API_BASE}/trade/access?address=${address}`);
@@ -114,6 +159,7 @@ export async function getAnalysis(params: {
   currentPrice: string;
   userBalance: string;
   walletAddress: Address;
+  tokenAddress?: Address;
 }): Promise<FullAnalysis> {
   const response = await fetch(`${API_BASE}/agent/analyze`, {
     method: 'POST',
@@ -142,4 +188,61 @@ export async function reportTradeComplete(txHash: string, feeAmountUSD: number):
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ txHash, feeAmountUSD }),
   });
+}
+
+// Market Data API Functions
+export async function getMarketOverview(): Promise<MarketOverview> {
+  const response = await fetch(`${API_BASE}/market/overview`);
+  if (!response.ok) {
+    throw new Error('Failed to get market overview');
+  }
+  return response.json();
+}
+
+export async function getTokenPrice(chainId: number, token: Address): Promise<TokenPrice | null> {
+  const response = await fetch(`${API_BASE}/market/price?chainId=${chainId}&token=${token}`);
+  if (!response.ok) {
+    return null;
+  }
+  return response.json();
+}
+
+export async function getTokenData(chainId: number, token: Address): Promise<{
+  price: TokenPrice | null;
+  marketData: TokenMarketData | null;
+  safety: TokenSafetyScore;
+}> {
+  const response = await fetch(`${API_BASE}/market/token?chainId=${chainId}&token=${token}`);
+  if (!response.ok) {
+    throw new Error('Failed to get token data');
+  }
+  return response.json();
+}
+
+export async function getTokenSafety(chainId: number, token: Address): Promise<TokenSafetyScore> {
+  const response = await fetch(`${API_BASE}/market/safety?chainId=${chainId}&token=${token}`);
+  if (!response.ok) {
+    throw new Error('Failed to get token safety');
+  }
+  return response.json();
+}
+
+export async function getGasPrices(chainId: number): Promise<GasPrices | null> {
+  const response = await fetch(`${API_BASE}/market/gas?chainId=${chainId}`);
+  if (!response.ok) {
+    return null;
+  }
+  return response.json();
+}
+
+export async function getHistoricalPrices(
+  chainId: number,
+  token: Address,
+  days = 7
+): Promise<Array<{ timestamp: number; price: number }> | null> {
+  const response = await fetch(`${API_BASE}/market/history?chainId=${chainId}&token=${token}&days=${days}`);
+  if (!response.ok) {
+    return null;
+  }
+  return response.json();
 }

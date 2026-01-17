@@ -21,12 +21,14 @@ const analysisSchema = z.object({
   currentPrice: z.string().min(1),
   userBalance: z.string().min(1),
   walletAddress: addressSchema,
+  tokenAddress: z.string().refine(isAddress, 'Invalid token address').optional(),
 });
 
 const researchSchema = z.object({
   tokenSymbol: z.string().min(1).max(20),
   chainId: z.number().int().positive(),
   walletAddress: addressSchema,
+  tokenAddress: z.string().refine(isAddress, 'Invalid token address').optional(),
 });
 
 // Get market research analysis
@@ -44,7 +46,7 @@ router.post('/research', async (req: Request, res: Response) => {
       return;
     }
 
-    const analysis = await researchAgent(params.tokenSymbol, params.chainId);
+    const analysis = await researchAgent(params.tokenSymbol, params.chainId, params.tokenAddress as Address);
     res.json(analysis);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -76,7 +78,8 @@ router.post('/analyze', async (req: Request, res: Response) => {
       params.tokenSymbol,
       params.chainId,
       params.currentPrice,
-      params.userBalance
+      params.userBalance,
+      params.tokenAddress as Address
     );
 
     res.json({

@@ -1,4 +1,12 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { Address } from 'viem';
+import {
+  getTokenPrice,
+  getTokenMarketData,
+  checkTokenSafety,
+  getMarketOverview,
+  getHistoricalPrices,
+} from './marketData.js';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -22,26 +30,92 @@ export interface TradeRecommendation {
   takeProfit?: string;
 }
 
-// Research Agent: Analyzes market conditions
+// Research Agent: Analyzes market conditions with real data
 export async function researchAgent(
   tokenSymbol: string,
-  chainId: number
+  chainId: number,
+  tokenAddress?: Address
 ): Promise<MarketAnalysis> {
+  // Fetch real market data
+  let marketDataContext = '';
+
+  if (tokenAddress) {
+    const [price, marketData, safety, history, overview] = await Promise.all([
+      getTokenPrice(chainId, tokenAddress),
+      getTokenMarketData(chainId, tokenAddress),
+      checkTokenSafety(chainId, tokenAddress),
+      getHistoricalPrices(chainId, tokenAddress, 7),
+      getMarketOverview(),
+    ]);
+
+    if (price) {
+      marketDataContext += `\n\nREAL-TIME MARKET DATA:
+- Current Price: $${price.usd.toFixed(6)}
+- 24h Change: ${price.usd_24h_change?.toFixed(2)}%`;
+    }
+
+    if (marketData) {
+      marketDataContext += `
+- 7d Change: ${marketData.priceChange7d?.toFixed(2)}%
+- 24h Volume: $${marketData.volume24h?.toLocaleString()}
+- Market Cap: $${marketData.marketCap?.toLocaleString()}
+- All-Time High: $${marketData.ath?.toFixed(6)} (${marketData.athChangePercent?.toFixed(2)}% from ATH)`;
+    }
+
+    if (safety) {
+      marketDataContext += `\n\nTOKEN SAFETY ANALYSIS:
+- Safety Score: ${safety.score}/100
+- Verified: ${safety.isVerified ? 'Yes' : 'No'}
+- Has Liquidity: ${safety.hasLiquidity ? 'Yes' : 'No'}`;
+      if (safety.risks.length > 0) {
+        marketDataContext += `\n- Risks: ${safety.risks.join(', ')}`;
+      }
+      if (safety.warnings.length > 0) {
+        marketDataContext += `\n- Warnings: ${safety.warnings.join(', ')}`;
+      }
+    }
+
+    if (history && history.length > 1) {
+      const priceStart = history[0].price;
+      const priceEnd = history[history.length - 1].price;
+      const weekChange = ((priceEnd - priceStart) / priceStart) * 100;
+      const highest = Math.max(...history.map(h => h.price));
+      const lowest = Math.min(...history.map(h => h.price));
+      marketDataContext += `\n\n7-DAY PRICE HISTORY:
+- Week Change: ${weekChange.toFixed(2)}%
+- Week High: $${highest.toFixed(6)}
+- Week Low: $${lowest.toFixed(6)}
+- Volatility: ${(((highest - lowest) / lowest) * 100).toFixed(2)}%`;
+    }
+
+    if (overview) {
+      marketDataContext += `\n\nGLOBAL MARKET CONTEXT:
+- Total Crypto Market Cap: $${(overview.totalMarketCap / 1e12).toFixed(2)}T
+- BTC Dominance: ${overview.btcDominance.toFixed(1)}%
+- ETH Dominance: ${overview.ethDominance.toFixed(1)}%`;
+      if (overview.trending.length > 0) {
+        marketDataContext += `\n- Trending: ${overview.trending.map(t => t.symbol).join(', ')}`;
+      }
+    }
+  }
+
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 1024,
-    system: `You are a crypto market research analyst for the MoonBoots Trading Agency. 
+    system: `You are a crypto market research analyst for the MoonBoots Trading Agency.
 Your role is to provide objective market analysis for trading decisions.
+You have access to REAL-TIME market data which you MUST use in your analysis.
 Always respond in valid JSON format matching the specified schema.
-Be concise but thorough. Focus on actionable insights.`,
+Be concise but thorough. Focus on actionable insights based on the actual data.`,
     messages: [
       {
         role: 'user',
         content: `Analyze the current market conditions for ${tokenSymbol} on chain ID ${chainId}.
-        
-Provide your analysis in this exact JSON format:
+${marketDataContext}
+
+Based on this REAL market data, provide your analysis in this exact JSON format:
 {
-  "summary": "Brief market overview",
+  "summary": "Brief market overview referencing the actual data",
   "sentiment": "bullish" | "bearish" | "neutral",
   "riskLevel": "low" | "medium" | "high",
   "opportunities": ["opportunity 1", "opportunity 2"],
@@ -187,12 +261,13 @@ export async function getFullAnalysis(
   tokenSymbol: string,
   chainId: number,
   currentPrice: string,
-  userBalance: string
+  userBalance: string,
+  tokenAddress?: Address
 ): Promise<{
   market: MarketAnalysis;
   recommendation: TradeRecommendation;
 }> {
-  const market = await researchAgent(tokenSymbol, chainId);
+  const market = await researchAgent(tokenSymbol, chainId, tokenAddress);
   const recommendation = await analysisAgent(
     tokenSymbol,
     currentPrice,
