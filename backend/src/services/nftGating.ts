@@ -9,7 +9,7 @@ const NFT_CONTRACTS = {
 };
 
 const MBDAO_TOKEN = process.env.MBDAO_TOKEN_ADDRESS as Address;
-const MBDAO_HOLDER_THRESHOLD = 1000n * 10n ** 18n; // 1000 tokens
+const MBDAO_HOLDER_THRESHOLD = 10000n * 10n ** 18n; // 10000 tokens
 
 // Simple ERC721 and ERC20 ABIs for balance checking
 const ERC721_ABI = parseAbi([
@@ -59,7 +59,7 @@ export interface AccessStatus {
 // Base fee in basis points (0.5%)
 const BASE_FEE_BPS = 50;
 const VIP_DISCOUNT = 0.20; // 20% off for VIP
-const MBDAO_HOLDER_DISCOUNT = 0.05; // Additional 5% off for 1000+ MBDAO holders
+const MBDAO_HOLDER_DISCOUNT = 0.05; // Additional 5% off for 10000+ MBDAO holders
 
 export async function checkNFTHoldings(address: Address): Promise<NFTHoldings> {
   const client = clients.base;
@@ -127,7 +127,7 @@ export async function checkAccess(address: Address): Promise<AccessStatus> {
   // VIP status requires MBDAO VIP NFT
   const isVIP = holdings.mbdaoVIP > 0;
 
-  // MBDAO holder bonus requires 1000+ tokens
+  // MBDAO holder bonus requires 10000+ tokens
   const isMBDAOHolder = BigInt(holdings.mbdaoTokens) >= MBDAO_HOLDER_THRESHOLD;
 
   // Calculate fee discount
