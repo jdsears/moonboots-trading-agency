@@ -114,7 +114,7 @@ function Dashboard() {
                 {(BigInt(accessStatus.holdings.mbdaoTokens) / BigInt(10 ** 18)).toLocaleString()}
               </p>
               {accessStatus.isMBDAOHolder && (
-                <span className="text-xs text-green-400">1000+ Holder Bonus</span>
+                <span className="text-xs text-green-400">10000+ Holder Bonus</span>
               )}
             </div>
           </div>
