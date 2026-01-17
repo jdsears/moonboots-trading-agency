@@ -79,6 +79,7 @@ function Trade() {
         currentPrice: quote?.price || '0',
         userBalance: sellAmount || '0',
         walletAddress: address,
+        tokenAddress: buyToken,
       });
     },
     onSuccess: (data) => {
