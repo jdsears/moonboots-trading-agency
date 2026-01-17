@@ -71,58 +71,81 @@ export async function checkNFTHoldings(address: Address): Promise<NFTHoldings> {
   const bscClient = clients.bsc;
   const baseClient = clients.base;
 
-  try {
-    const [moonbootsMB1, chappyz, mbdaoVIP, mbdaoTokens] = await Promise.all([
-      NFT_CONTRACTS.MOONBOOTS_MB1
-        ? polygonClient.readContract({
-            address: NFT_CONTRACTS.MOONBOOTS_MB1,
-            abi: ERC721_ABI,
-            functionName: 'balanceOf',
-            args: [address],
-          })
-        : 0n,
-      NFT_CONTRACTS.CHAPPYZ
-        ? bscClient.readContract({
-            address: NFT_CONTRACTS.CHAPPYZ,
-            abi: ERC721_ABI,
-            functionName: 'balanceOf',
-            args: [address],
-          })
-        : 0n,
-      NFT_CONTRACTS.MBDAO_VIP
-        ? polygonClient.readContract({
-            address: NFT_CONTRACTS.MBDAO_VIP,
-            abi: ERC721_ABI,
-            functionName: 'balanceOf',
-            args: [address],
-          })
-        : 0n,
-      MBDAO_TOKEN
-        ? baseClient.readContract({
-            address: MBDAO_TOKEN,
-            abi: ERC20_ABI,
-            functionName: 'balanceOf',
-            args: [address],
-          })
-        : 0n,
-    ]);
+  let moonbootsMB1 = 0n;
+  let chappyz = 0n;
+  let mbdaoVIP = 0n;
+  let mbdaoTokens = 0n;
 
-    return {
-      moonbootsMB1: Number(moonbootsMB1),
-      chappyz: Number(chappyz),
-      mbdaoVIP: Number(mbdaoVIP),
-      mbdaoTokens: mbdaoTokens.toString(),
-    };
-  } catch (error) {
-    console.error('Error checking NFT holdings:', error);
-    // Return zeros on error - user won't have access
-    return {
-      moonbootsMB1: 0,
-      chappyz: 0,
-      mbdaoVIP: 0,
-      mbdaoTokens: '0',
-    };
+  // Check MoonBoots MB1 on Polygon
+  if (NFT_CONTRACTS.MOONBOOTS_MB1) {
+    try {
+      console.log(`Checking MoonBoots MB1 at ${NFT_CONTRACTS.MOONBOOTS_MB1} for ${address}`);
+      moonbootsMB1 = await polygonClient.readContract({
+        address: NFT_CONTRACTS.MOONBOOTS_MB1,
+        abi: ERC721_ABI,
+        functionName: 'balanceOf',
+        args: [address],
+      });
+      console.log(`MoonBoots MB1 balance: ${moonbootsMB1}`);
+    } catch (error) {
+      console.error('Error checking MoonBoots MB1:', error);
+    }
   }
+
+  // Check Chappyz on BSC
+  if (NFT_CONTRACTS.CHAPPYZ) {
+    try {
+      console.log(`Checking Chappyz at ${NFT_CONTRACTS.CHAPPYZ} for ${address}`);
+      chappyz = await bscClient.readContract({
+        address: NFT_CONTRACTS.CHAPPYZ,
+        abi: ERC721_ABI,
+        functionName: 'balanceOf',
+        args: [address],
+      });
+      console.log(`Chappyz balance: ${chappyz}`);
+    } catch (error) {
+      console.error('Error checking Chappyz:', error);
+    }
+  }
+
+  // Check MBDAO VIP on Polygon
+  if (NFT_CONTRACTS.MBDAO_VIP) {
+    try {
+      console.log(`Checking MBDAO VIP at ${NFT_CONTRACTS.MBDAO_VIP} for ${address}`);
+      mbdaoVIP = await polygonClient.readContract({
+        address: NFT_CONTRACTS.MBDAO_VIP,
+        abi: ERC721_ABI,
+        functionName: 'balanceOf',
+        args: [address],
+      });
+      console.log(`MBDAO VIP balance: ${mbdaoVIP}`);
+    } catch (error) {
+      console.error('Error checking MBDAO VIP:', error);
+    }
+  }
+
+  // Check MBDAO tokens on Base
+  if (MBDAO_TOKEN) {
+    try {
+      console.log(`Checking MBDAO token at ${MBDAO_TOKEN} for ${address}`);
+      mbdaoTokens = await baseClient.readContract({
+        address: MBDAO_TOKEN,
+        abi: ERC20_ABI,
+        functionName: 'balanceOf',
+        args: [address],
+      });
+      console.log(`MBDAO token balance: ${mbdaoTokens}`);
+    } catch (error) {
+      console.error('Error checking MBDAO tokens:', error);
+    }
+  }
+
+  return {
+    moonbootsMB1: Number(moonbootsMB1),
+    chappyz: Number(chappyz),
+    mbdaoVIP: Number(mbdaoVIP),
+    mbdaoTokens: mbdaoTokens.toString(),
+  };
 }
 
 export async function checkAccess(address: Address): Promise<AccessStatus> {
