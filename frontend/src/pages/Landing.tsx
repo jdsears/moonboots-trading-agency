@@ -46,7 +46,7 @@ function Landing() {
                   </div>
                   <div>
                     <p className="font-medium">AI Trading Agents</p>
-                    <p className="text-sm text-gray-500">Powered by Claude</p>
+                    <p className="text-sm text-gray-500">Powered by Chappyz</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
