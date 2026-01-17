@@ -20,27 +20,27 @@ const ERC20_ABI = parseAbi([
   'function balanceOf(address owner) view returns (uint256)',
 ]);
 
-// Chain clients
+// Chain clients with custom RPC URLs for reliability
 const clients = {
   base: createPublicClient({
     chain: base,
-    transport: http(),
+    transport: http(process.env.BASE_RPC_URL),
   }),
   mainnet: createPublicClient({
     chain: mainnet,
-    transport: http(),
+    transport: http(process.env.ETH_RPC_URL),
   }),
   polygon: createPublicClient({
     chain: polygon,
-    transport: http(),
+    transport: http(process.env.POLYGON_RPC_URL),
   }),
   arbitrum: createPublicClient({
     chain: arbitrum,
-    transport: http(),
+    transport: http(process.env.ARBITRUM_RPC_URL),
   }),
   bsc: createPublicClient({
     chain: bsc,
-    transport: http(),
+    transport: http(process.env.BSC_RPC_URL),
   }),
 };
 
