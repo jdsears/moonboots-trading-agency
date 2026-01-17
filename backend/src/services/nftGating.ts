@@ -66,9 +66,8 @@ const VIP_DISCOUNT = 0.20; // 20% off for VIP
 const MBDAO_HOLDER_DISCOUNT = 0.05; // Additional 5% off for 10000+ MBDAO holders
 
 export async function checkNFTHoldings(address: Address): Promise<NFTHoldings> {
-  // MoonBoots MB1 on Polygon, Chappyz on BSC, MBDAO token on Base
+  // MoonBoots MB1 & MBDAO VIP on Polygon, Chappyz on Ethereum, MBDAO token on Base
   const polygonClient = clients.polygon;
-  const bscClient = clients.bsc;
   const baseClient = clients.base;
 
   let moonbootsMB1 = 0n;
@@ -92,11 +91,11 @@ export async function checkNFTHoldings(address: Address): Promise<NFTHoldings> {
     }
   }
 
-  // Check Chappyz on BSC
+  // Check Chappyz on Ethereum mainnet
   if (NFT_CONTRACTS.CHAPPYZ) {
     try {
       console.log(`Checking Chappyz at ${NFT_CONTRACTS.CHAPPYZ} for ${address}`);
-      chappyz = await bscClient.readContract({
+      chappyz = await clients.mainnet.readContract({
         address: NFT_CONTRACTS.CHAPPYZ,
         abi: ERC721_ABI,
         functionName: 'balanceOf',
