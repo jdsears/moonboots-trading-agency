@@ -12,7 +12,7 @@ function Landing() {
         <div className="relative max-w-6xl mx-auto px-6 py-20">
           {/* Logo */}
           <div className="flex items-center gap-3 mb-16">
-            <Moon className="w-10 h-10 text-moonboots-purple" />
+            <img src="/logo.png" alt="MoonBoots" className="h-10 w-auto" />
             <span className="text-2xl font-bold gradient-text">MoonBoots Trading Agency</span>
           </div>
 

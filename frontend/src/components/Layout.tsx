@@ -1,6 +1,6 @@
 import { Outlet, NavLink } from 'react-router-dom';
 import { useAccount, useDisconnect } from 'wagmi';
-import { LayoutDashboard, ArrowLeftRight, Wallet, Settings, LogOut, Moon } from 'lucide-react';
+import { LayoutDashboard, ArrowLeftRight, Wallet, Settings, LogOut } from 'lucide-react';
 import { useTradingStore } from '../lib/store';
 
 function Layout() {
@@ -25,7 +25,7 @@ function Layout() {
         {/* Logo */}
         <div className="p-6 border-b border-gray-800">
           <div className="flex items-center gap-3">
-            <Moon className="w-8 h-8 text-moonboots-purple" />
+            <img src="/logo.png" alt="MoonBoots" className="h-8 w-auto" />
             <span className="text-xl font-bold gradient-text">MoonBoots</span>
           </div>
           <p className="text-xs text-gray-500 mt-1">Trading Agency</p>
