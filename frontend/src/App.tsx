@@ -34,10 +34,10 @@ function App() {
           <Route path="*" element={<Landing />} />
         ) : (
           <Route element={<Layout />}>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<Chat />} />
             <Route path="/trade" element={<Trade />} />
-            <Route path="/chat" element={<Chat />} />
             <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/settings" element={<Settings />} />
           </Route>
         )}

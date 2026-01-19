@@ -9,10 +9,10 @@ function Layout() {
   const accessStatus = useTradingStore((s) => s.accessStatus);
 
   const navItems = [
-    { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
+    { to: '/', icon: MessageCircle, label: 'Luna AI' },
     { to: '/trade', icon: ArrowLeftRight, label: 'Trade' },
-    { to: '/chat', icon: MessageCircle, label: 'Luna AI' },
     { to: '/portfolio', icon: Wallet, label: 'Portfolio' },
+    { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/settings', icon: Settings, label: 'Settings' },
   ];
 
