@@ -25,6 +25,27 @@ const LLAMA_CHAINS: Record<number, string> = {
   56: 'bsc',
 };
 
+// Native token placeholder address
+const NATIVE_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase();
+
+// Wrapped native token addresses for price lookups
+const WRAPPED_NATIVE: Record<number, Address> = {
+  1: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2' as Address,    // WETH on Ethereum
+  8453: '0x4200000000000000000000000000000000000006' as Address,  // WETH on Base
+  137: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270' as Address,   // WMATIC on Polygon
+  42161: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' as Address, // WETH on Arbitrum
+  56: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c' as Address,    // WBNB on BSC
+};
+
+// CoinGecko IDs for native tokens (for direct lookup)
+const NATIVE_COINGECKO_IDS: Record<number, string> = {
+  1: 'ethereum',
+  8453: 'ethereum',  // Base uses ETH
+  137: 'matic-network',
+  42161: 'ethereum',  // Arbitrum uses ETH
+  56: 'binancecoin',
+};
+
 export interface TokenPrice {
   usd: number;
   usd_24h_change: number;
@@ -95,9 +116,50 @@ export async function getTokenPrice(chainId: number, tokenAddress: Address): Pro
   if (!chain) return null;
 
   const cacheKey = `price:${chainId}:${tokenAddress}`;
+  const isNativeToken = tokenAddress.toLowerCase() === NATIVE_TOKEN_ADDRESS;
 
   try {
     return await cachedFetch(cacheKey, async () => {
+      // For native tokens, try CoinGecko simple price first (more reliable)
+      if (isNativeToken) {
+        const coinId = NATIVE_COINGECKO_IDS[chainId];
+        if (coinId) {
+          const cgResponse = await fetch(
+            `${COINGECKO_API}/simple/price?ids=${coinId}&vs_currencies=usd&include_24hr_change=true&include_market_cap=true`
+          );
+          if (cgResponse.ok) {
+            const cgData = await cgResponse.json() as Record<string, { usd?: number; usd_24h_change?: number; usd_market_cap?: number }>;
+            const coinData = cgData[coinId];
+            if (coinData?.usd) {
+              return {
+                usd: coinData.usd,
+                usd_24h_change: coinData.usd_24h_change || 0,
+                usd_market_cap: coinData.usd_market_cap,
+              };
+            }
+          }
+        }
+
+        // Fallback: use wrapped token address for native tokens
+        const wrappedAddress = WRAPPED_NATIVE[chainId];
+        if (wrappedAddress) {
+          const tokenId = `${chain}:${wrappedAddress.toLowerCase()}`;
+          const response = await fetch(`${DEFILLAMA_COINS_API}/prices/current/${tokenId}`);
+          if (response.ok) {
+            const data = await response.json() as { coins?: Record<string, { price: number; change24h?: number; mcap?: number }> };
+            const coin = data.coins?.[tokenId];
+            if (coin) {
+              return {
+                usd: coin.price,
+                usd_24h_change: coin.change24h || 0,
+                usd_market_cap: coin.mcap,
+              };
+            }
+          }
+        }
+        return null;
+      }
+
       // DeFiLlama format: chain:address
       const tokenId = `${chain}:${tokenAddress.toLowerCase()}`;
       const response = await fetch(`${DEFILLAMA_COINS_API}/prices/current/${tokenId}`);
@@ -356,9 +418,50 @@ export async function getHistoricalPrices(
   if (!chain) return null;
 
   const cacheKey = `history:${chainId}:${tokenAddress}:${days}`;
+  const isNativeToken = tokenAddress.toLowerCase() === NATIVE_TOKEN_ADDRESS;
 
   try {
     return await cachedFetch(cacheKey, async () => {
+      // For native tokens, try CoinGecko market chart first
+      if (isNativeToken) {
+        const coinId = NATIVE_COINGECKO_IDS[chainId];
+        if (coinId) {
+          const cgResponse = await fetch(
+            `${COINGECKO_API}/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`
+          );
+          if (cgResponse.ok) {
+            const cgData = await cgResponse.json() as { prices?: Array<[number, number]> };
+            if (cgData.prices && cgData.prices.length > 0) {
+              return cgData.prices.map(([timestamp, price]) => ({
+                timestamp: Math.floor(timestamp / 1000),
+                price,
+              }));
+            }
+          }
+        }
+
+        // Fallback: use wrapped token address
+        const wrappedAddress = WRAPPED_NATIVE[chainId];
+        if (wrappedAddress) {
+          const tokenId = `${chain}:${wrappedAddress.toLowerCase()}`;
+          const end = Math.floor(Date.now() / 1000);
+          const start = end - (days * 24 * 60 * 60);
+
+          const response = await fetch(
+            `${DEFILLAMA_COINS_API}/chart/${tokenId}?start=${start}&span=${days}`
+          );
+
+          if (response.ok) {
+            const data = await response.json() as { coins?: Record<string, { prices?: Array<{ timestamp: number; price: number }> }> };
+            return data.coins?.[tokenId]?.prices?.map((p) => ({
+              timestamp: p.timestamp,
+              price: p.price,
+            })) || null;
+          }
+        }
+        return null;
+      }
+
       const tokenId = `${chain}:${tokenAddress.toLowerCase()}`;
       const end = Math.floor(Date.now() / 1000);
       const start = end - (days * 24 * 60 * 60);
